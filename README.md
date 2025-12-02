@@ -15,10 +15,8 @@ United State's Census Bureau (https://data.census.gov/table/ACSST5Y2023.S2201?q=
 ADD GROCERY STORE DATA
 
 AI disclosure: 
- Show your favicon
- The application URL (not the repository url)
- Screenshots
- Main functions
- Data sources
- Applied libraries (e.g., mapbox gl js) and Web Services (e.g., github, basemap) in use
+Show your favicon
+The application URL (not the repository url)
+Screenshots
+Applied libraries (e.g., mapbox gl js) and Web Services (e.g., github, basemap) in use
 
