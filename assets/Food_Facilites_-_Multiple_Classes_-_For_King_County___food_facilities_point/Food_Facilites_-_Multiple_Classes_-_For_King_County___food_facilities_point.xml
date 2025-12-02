@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+    <idinfo>
+        <citation>
+            <citeinfo>
+                <origin/>
+                <pubdate>20101129</pubdate>
+                <title>Food Facilites - Multiple Classes - For King County / food_facilities_point</title>
+                <edition>One</edition>
+                <geoform>vector digital data</geoform>
+                <pubinfo>
+                    <pubplace/>
+                    <publish>King County</publish>
+                </pubinfo>
+                <othercit>None</othercit>
+                <onlink>https://kingcounty.maps.arcgis.com/home/item.html?id=326cb26c6bb549529f608d7d5f40853b</onlink>
+                <onlink>https://kingcounty.maps.arcgis.com/home/item.html?id=526cdf3320c44101a8bf37487ea0047d</onlink>
+                <onlink>http://www5.kingcounty.gov/sdc/Metadata.aspx?Layer=food_facilities</onlink>
+                <onlink>http://www5.kingcounty.gov/sdc/addl_doc/KCGISCenterTermsAndConditions.pdf</onlink>
+                <onlink>http://www5.kingcounty.gov/sdc/addl_doc/KCGISCenterHelpUsingKCOpenData.pdf</onlink>
+            </citeinfo>
+        </citation>
+        <descript>
+            <abstract>Unique selection, by food facility name, from the King County Dept of Health Restaurant Inspection database (RESTAURANT_INSPECTIONS_POINT). Includes information whether facility is part of food chain. This featureclass is part of the COMMON_INTEREST_POINT layer as a unique domain within that database.</abstract>
+            <purpose>Provides one view of all the food facilities that are within the inspection area. RESTAURANT_INSPECTIONS_POINT provides these same locations but is a one to many database as a single food location may have multiple records in that inspections database. In the FOOD_FACILITIES_POINT layer each facility appears only one time for greater ease of use. In addition, the inspection attributes that are part of the RESTAURANT_INSPECTIONS_POINT layer are not included in the FOOD_FACILITIES_POINT layer.</purpose>
+            <supplinf>None</supplinf>
+        </descript>
+        <timeperd>
+            <timeinfo>
+                <sngdate>
+                    <caldate>20140707</caldate>
+                </sngdate>
+            </timeinfo>
+            <current>publication date</current>
+        </timeperd>
+        <status>
+            <progress>Complete</progress>
+            <update>Quarterly</update>
+        </status>
+        <spdom>
+            <bounding>
+                <westbc>-122.532093</westbc>
+                <eastbc>-121.353699</eastbc>
+                <northbc>47.785428</northbc>
+                <southbc>47.173437</southbc>
+            </bounding>
+        </spdom>
+        <keywords>
+            <theme>
+                <themekt>Not applicable</themekt>
+                <themekey>administrative_OpenData</themekey>
+                <themekey>restaurants</themekey>
+                <themekey>school kitchens</themekey>
+                <themekey>grocery stores</themekey>
+                <themekey>bakeries</themekey>
+                <themekey>food facilities</themekey>
+                <themekey>admin</themekey>
+                <themekey>food_facilities_point</themekey>
+                <themekey>kingcounty_opendata</themekey>
+            </theme>
+            <place>
+                <placekt>Not applicable</placekt>
+                <placekey>Pacific NW</placekey>
+                <placekey>King County</placekey>
+                <placekey>Washington state</placekey>
+                <placekey>WA</placekey>
+            </place>
+        </keywords>
+        <accconst>None</accconst>
+        <useconst>King County data are made available with the understanding that they shall be used exclusively by the obtainer or his/her authorized agents. Digital products may not be reproduced or redistributed in any form or by any means without the express written authorization of King County.</useconst>
+        <ptcontac>
+            <cntinfo>
+                <cntorgp>
+                    <cntorg>King County Dept. of Public Health</cntorg>
+                    <cntper>Brent Veenstra</cntper>
+                </cntorgp>
+                <cntpos>IT Manager</cntpos>
+                <cntaddr>
+                    <addrtype>mailing and physical</addrtype>
+                    <address>401 5th Ave, Suite 1200</address>
+                    <city>Seattle</city>
+                    <state>WA</state>
+                    <postal>98104</postal>
+                    <country>US</country>
+                </cntaddr>
+                <cntvoice>206-263-8666</cntvoice>
+            </cntinfo>
+        </ptcontac>
+        <browse>
+            <browsen>http://www5.kingcounty.gov/sdc/DataImages/food_facilities.jpg</browsen>
+            <browsed>JPG File of layer overlain on base of WA counties or local cities</browsed>
+            <browset>JPG</browset>
+        </browse>
+        <native>ESRI ArcGIS 10.0.3.3600</native>
+    </idinfo>
+    <dataqual>
+        <attracc>
+            <attraccr>No attribute accuracy analysis is performed beyond what is published to the DPH website</attraccr>
+        </attracc>
+        <logic>Each record is a unique occurrence of the value in the PROGRAM_IDENTIFIER field</logic>
+        <complete>This database is directly derived from, and thus dependent upon, the completeness and content of the RESTAURANT_INSPECTIONS_POINT database.</complete>
+        <lineage>
+            <procstep>
+                <procdesc>A frequency table is created from the RESTAURANT_INSPECTIONS_POINT database. This unique list is then joined with restaurant chain information and the composite table is then exported to a csv file in a schema compatible with COMMON_INTEREST_POINT. This list is loaded to COMMON_INTEREST_POINT and the associated COMMON_INTEREST_FF (business table attributes). Standard COMMON INTEREST routines are run to create the child featureclass, FOOD_FACILITIES_POINT.</procdesc>
+            </procstep>
+            <procstep>
+                <procdesc>Data records where downloaded from http://info.kingcounty.gov/health/ehs/foodsafety/inspections/search.aspx Individual alpha record sets were appended and reformatted for delimiter conformance. Python scripts were used to assemble data tables, join information about restaurant chain, and create a spatial featureclass from tabular coordinate data. Data is loaded directly from the DPH database except in that the DESCRIPTION field which contains both Seating Capacity and Risk information is broken (parsed) into two separate fields: SEAT_CAP and RISK. Frequency analysis is used to create unique list of Program Identifier (facility name) with associated attributes that is passed to the Common Interest project area for uploading to tables to create new records in COMMON_INTEREST_POINT and a new FOOD_FACILITY featureclass. This process is performed three times a year - April, August and December - unless documented otherwise with a unique process step.</procdesc>
+                <procdate>20120817</procdate>
+            </procstep>
+            <procstep>
+                <procdesc>Updated with current information from RESTAURANT_INSPECTIONS_POINT. Per standard script - AddNewCommonInterestFeatures.py</procdesc>
+                <procdate>20140707</procdate>
+            </procstep>
+        </lineage>
+    </dataqual>
+    <spdoinfo>
+        <direct>Vector</direct>
+        <ptvctinf>
+            <sdtsterm>
+                <sdtstype>Entity point</sdtstype>
+                <ptvctcnt>0</ptvctcnt>
+            </sdtsterm>
+        </ptvctinf>
+    </spdoinfo>
+    <eainfo>
+        <detailed>
+            <enttyp>
+                <enttypl>PLIBRARY.ADMIN.xxxx741366</enttypl>
+                <enttypd>Point attribute table</enttypd>
+                <enttypds>ESRI</enttypds>
+            </enttyp>
+            <attr>
+                <attrlabl>OBJECTID</attrlabl>
+                <attrdef>Internal feature number.</attrdef>
+                <attrdefs>ESRI</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Sequential unique whole numbers that are automatically generated.</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>FEATURE_ID</attrlabl>
+                <attrdef>Unique identifier for each record</attrdef>
+                <attrdefs>King County</attrdefs>
+                <attrdomv>
+                    					
+                    <rdom>
+                        						
+                        <rdommin>1</rdommin>
+                        						
+                        <rdommax>133827</rdommax>
+                        						
+                        <attrmres>1</attrmres>
+                        					
+                    </rdom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>ESITE</attrlabl>
+                <attrdef>Unique identifier from ADDRESS_POINT database</attrdef>
+                <attrdefs>King County</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>1-7 digit value as text or '0000000' if unknown</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>CODE</attrlabl>
+                <attrdef>Coded Value Domain lookup value</attrdef>
+                <attrdefs>King County</attrdefs>
+                <attrdomv>
+                    					
+                    <edom>
+                        						
+                        <edomv>350</edomv>
+                        						
+                        <edomvd>Food facility</edomvd>
+                        						
+                        <edomvds>King County</edomvds>
+                        					
+                    </edom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>NAME</attrlabl>
+                <attrdef>Name of restaurant or other food facility</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Uppercase alpha</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>ABB_NAME</attrlabl>
+                <attrdef>Abbreviated name for feature</attrdef>
+                <attrdefs>King County</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Mixed text</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>SEAT_CAP</attrlabl>
+                <attrdef>Size (seating capacity) when appropriate</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <edom>
+                        						
+                        <edomv>Bakery</edomv>
+                        						
+                        <edomvd>Bakery</edomvd>
+                        						
+                        <edomvds>Public Health - King County and Seattle</edomvds>
+                        					
+                    </edom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>RISK</attrlabl>
+                <attrdef>Risk category of facility when appropriate</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <edom>
+                        						
+                        <edomv>No risk info</edomv>
+                        						
+                        <edomvd>No Risk Information</edomvd>
+                        						
+                        <edomvds>Publiic Health - King County and Seattle</edomvds>
+                        					
+                    </edom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>ADDRESS</attrlabl>
+                <attrdef>Full street address of facility</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Address number and uppercase street name; non-standard abbreviations</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>PHONE</attrlabl>
+                <attrdef>Area code and phone number of facility</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>NULL or form (###) ###-####</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>ZIPCODE</attrlabl>
+                <attrdef>5 digit zipcode of facility</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>5 digits as string</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>CITY</attrlabl>
+                <attrdef>City where facility is located</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Mixed case full city name</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>Shape</attrlabl>
+                <attrdef>Feature geometry.</attrdef>
+                <attrdefs>ESRI</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Coordinates defining the features.</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>RECORD_ID</attrlabl>
+                <attrdef>Record identifier if facility is a chain</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Alpha numeric string</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>FACILITY_NAME</attrlabl>
+                <attrdef>Facility name if a chain or housing a chain</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Uppercase string; may be same as Chain Name or different</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>CHAIN_NAME</attrlabl>
+                <attrdef>Name of chain if facility is a chain</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Uppercase string; may be same as Facility Name or different</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>CHAIN_ESTABLISHMENT</attrlabl>
+                <attrdef>Whether facility is chain or not</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Either NULL (not a chain) or Y (Yes)</udom>
+                    				
+                </attrdomv>
+            </attr>
+            <attr>
+                <attrlabl>SITE_ADDRESS</attrlabl>
+                <attrdef>Full street address of chain home location</attrdef>
+                <attrdefs>Public Health - King County and Seattle</attrdefs>
+                <attrdomv>
+                    					
+                    <udom>Address number and uppercase name; non-standard abbreviations</udom>
+                    				
+                </attrdomv>
+            </attr>
+        </detailed>
+        <overview>
+            <eaover>Attributes are derived directly from DPH Restaurant Inspections website. The DESCRIPTION attribute is evaluated to separate size information from risk information. Otherwise all attributes are stored as found on the DPH website.</eaover>
+            <eadetcit>None</eadetcit>
+        </overview>
+    </eainfo>
+    <distinfo>
+        <distrib>
+            <cntinfo>
+                <cntorgp>
+                    <cntorg>KCGIS Center</cntorg>
+                    <cntper>Cheryl Wilder</cntper>
+                </cntorgp>
+                <cntpos>Data Sales Coordinator</cntpos>
+                <cntaddr>
+                    <addrtype>mailing and physical</addrtype>
+                    <address>201 S Jackson St, Suite 700</address>
+                    <city>Seattle</city>
+                    <state>WA</state>
+                    <postal>98104</postal>
+                    <country>US</country>
+                </cntaddr>
+                <cntvoice>206-263-5220</cntvoice>
+            </cntinfo>
+        </distrib>
+        <resdesc>/plibrary2/admin/shapes/point/food_facilities.shp</resdesc>
+        <distliab>King County disclaims any warranty of use of any digital product or data beyond that for which it was designed.</distliab>
+        <stdorder>
+            <digform>
+                <digtinfo>
+                    <formname>ESRI Shapefile</formname>
+                </digtinfo>
+            </digform>
+            <fees>Contact KCGIS Client Services for the cost of reproduction - http://www.kingcounty.gov/operations/GIS/GISData/GISDataDistribution.aspx</fees>
+        </stdorder>
+    </distinfo>
+    <metainfo>
+        <metd>20140707</metd>
+        <metc>
+            <cntinfo>
+                <cntorgp>
+                    <cntorg>KCGIS Center</cntorg>
+                    <cntper>Mike Leathers</cntper>
+                </cntorgp>
+                <cntpos>Data Coordinator</cntpos>
+                <cntaddr>
+                    <addrtype>mailing and physical</addrtype>
+                    <address>201 S Jackson St, Ste 706</address>
+                    <city>Seattle</city>
+                    <state>WA</state>
+                    <postal>98104</postal>
+                    <country>US</country>
+                </cntaddr>
+                <cntvoice>206-263-4867</cntvoice>
+                <cntemail>firstname.lastname@kingcounty.gov</cntemail>
+            </cntinfo>
+        </metc>
+        <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+        <metstdv>FGDC-STD-001-1998</metstdv>
+        <mettc>local time</mettc>
+    </metainfo>
+</metadata>
