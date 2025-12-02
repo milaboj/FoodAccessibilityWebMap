@@ -8,12 +8,10 @@ The SNAP benefits map is a choropleth map that
 The distance to grocery stores map 
 
 Our data was retrieved from:
-Department of Agriculture's Food Access Research Atlas 
-https://catalog.data.gov/dataset/food-access-research-atlas 
-Washington's State's 2025 Census
-https://catalog.data.gov/dataset/waofm-april-1-population-by-state-county-and-city-1990-to-present)
-United State's Census Bureau
-https://data.census.gov/table/ACSST5Y2023.S2201?q=S2201:+Food+Stamps/Supplemental+Nutrition+Assistance+Program+(SNAP)&g=040XX00US53$0500000
+
+Department of Agriculture's Food Access Research Atlas (https://catalog.data.gov/dataset/food-access-research-atlas) 
+Washington's State's 2025 Census (https://catalog.data.gov/dataset/waofm-april-1-population-by-state-county-and-city-1990-to-present)
+United State's Census Bureau (https://data.census.gov/table/ACSST5Y2023.S2201?q=S2201:+Food+Stamps/Supplemental+Nutrition+Assistance+Program+(SNAP)&g=040XX00US53$0500000)
 ADD GROCERY STORE DATA
 
 AI disclosure: 
