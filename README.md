@@ -1,16 +1,3 @@
-# geo328groupProject
- You need to create a readme.md file and save it in the root of the final project repository. This description must be no less than 800 words. In the repository, please describe the web map. Your description needs to include, but not limited to, the following items:
- Project title - Food Access in Washington State
- Project description one map with -county population choropleth -and snap heatmap 
- and second map w - food access regions -and county population choropleth 
- Show your favicon
- Project goal (such as, what is the message you want to deliver through your project?)
- The application URL (not the repository url)
- Screenshots
- Main functions
- Data sources
- Applied libraries (e.g., mapbox gl js) and Web Services (e.g., github, basemap) in use
- Acknowledgments
- AI Use Disclosure: If you have used ChatGPT or other generative AI tools, please indicate how they have been used.
- Other things that are necessary to inform the audience.
- Your readme.md file should be well-formatted and free of grammatical errors
+# Food Access in Washington State
+ Our project is an interactive tool that helps people get a better idea on what food access in our state looks like. Food deserts are an important concept to understand equality issues, but one that isn't yet widely known, especially by the people who might be affected by it. In Washington, food deserts are concentrated in low-income urban and rural areas, such as parts of South Seattle, Yakima, and Spokane. They are areas where residents have limited access to affordable, nutritious food, which has a direct negative impact on their health and quality of life. These disparities are often linked to transportation barriers, systemic inequities, and a lack of nearby grocery stores or fresh-produce markets. Our target audience is Washington residents that don't know much about this concept or people that are curious about what patterns within this theme exist close to them. 
+This website has two maps that come together to illustrate the supply limitations (distance to grocery stores) and an example of a solution to this barrier (SNAP benefits). Users are able to look up an address or selected point's distance to the nearest grocery store on the first map, and then use their finds to analyze the number households enrolled on SNAP benefits in each county. Hopefully, this will raise awareness that this lack of access isn't a coincidence – there are spatial motifs that can be addressed. 
