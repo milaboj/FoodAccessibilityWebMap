@@ -28,6 +28,7 @@
 
 <body>
 
+  
   <!-- Top navigation (same structure as other pages) -->
   <div class="topnav" id="myTopnav">
         <!-- Links to different sections -->
@@ -46,16 +47,23 @@
         </a>
     </div>
 
-  <!-- Map + sidebar layout -->
-  <div class="content">
-    <div class="sidebar">
-      <div class="heading">
-        <h1>Our locations</h1>
+    <div class="content">
+      <!-- Section 2 content -->
+      <div class="sidebar">
+        <div class="heading">
+          <h1>Our locations</h1>
+        </div>
+
+        <div id="listings" class="listings"></div>
       </div>
-      <div id="listings" class="listings"></div>
-    </div>
 
     <div id="map" class="map"></div>
+    </div>
+
+  <!-- Description placeholder -->
+  <div class="description-box">
+    This map shows the closest grocery store to SNAP benefit locations in Seattle, WA.
+    The blue markers represents the grocery stores.
   </div>
 
   <!-- JS: your nav script (optional) -->
