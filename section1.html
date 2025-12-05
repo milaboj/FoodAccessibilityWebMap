@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SNAP Benefits Map</title>
+
+    <!-- Keep your template CSS -->
+    <link rel="stylesheet" href="css/template.css">
+
+    <!-- Mapbox (needed for the inserted snapMap map) -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.js"></script>
+
+    <style>
+        /* Make embed container follow page layout */
+        .map-container {
+            width: 100%;
+            height: 600px; /* adjust height as you need */
+            margin-top: 20px;
+            border: 1px solid #ccc;
+        }
+
+        /* Description part */
+        .description-box {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation bar -->
+    <div class="topnav" id="myTopnav">
+        <a href="index.html">Overview</a>
+        <a href="section2.html">Closest Grocery Map</a>
+        <a class="active" a href="section1.html">SNAP Benefits Map</a>
+        <a href="section3.html">What now?</a>
+        <a href="references.html">References</a>
+
+        <a href="javascript:void(0);" class="icon">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+
+    <!-- Page content -->
+    <div class="content">
+
+        <h2>SNAP Benefits Map</h2>
+
+        <!-- Map from snapMap.html is embedded here -->
+        <iframe src="snapMap.html" class="map-container"></iframe>
+
+        <!-- Description placeholder -->
+        <div class="description-box">
+        Here, you can visualize the household participation in the Supplemental Nutrition Assistance Program (SNAP) using 
+        county level data from the U.S Census Bureau. Each county is shaded based on the number of households receiving
+         SNAP benefits. When hovering over a county, users are able to see the exact number of households enrolled in 
+         SNAP for that area. Clicking on a specific county reveals additional stats by showing food access data including
+          the percentage of the county's population living more than 0.5 miles, 1 mile, 10 miles, and 20 miles of a food 
+          source, helping users understand how SNAP participation and food accessibility intersect.
+
+        </div>
+
+    </div>
+
+    <script src="js/template.js"></script>
+
+</body>
+</html>

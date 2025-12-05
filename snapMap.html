@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Interactive Web Mapping</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    
+    <!-- Mapbox GL JS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.js"></script>
+    
+    <style>
+       body {
+        margin: 0;
+        padding: 0;
+        }
+         h2, h3 {
+            margin: 10px;
+            font-size: 18px;
+        }
+
+        h3 {
+            font-size: 16px;
+        }
+
+        p {
+            margin: 10px;
+        }
+        /* Full page map*/
+        #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+       }
+
+        .map-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background: rgba(255, 255, 255, 0.8);
+        border-style: solid;
+        border-width: 1px;
+        border-color: rgba(0, 0, 0, 0.2);
+        margin-left: 20px;
+        font-family: Arial, sans-serif;
+        overflow: auto;
+        border-radius: 3px;
+        }
+        /*Hover box*/
+        #features {
+            top: 0;
+            right: 0;
+            left: auto;
+            width: 255px;
+            max-height: 150px; /* prevents it from going off screen */
+            height: auto; 
+            overflow-y: auto; /* adds scroll only if content exceeds max-height */
+            transition: max-height 0.3s ease, width 0.3 ease; /* animates to transition between expanded smoothly */
+            display: none; /* hides until checked */
+        }
+        /* Expanded side box once clicked*/
+        #features.expanded{
+            width:255px;
+            max-height: 35%;
+        }
+        /*Legend container*/
+        #legend {
+            padding: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            line-height: 18px;
+            height: auto;
+            margin-bottom: 40px;
+            width: 150px;
+        }
+        /*Colored squares*/
+        .legend-key {
+            display: inline-block;
+            border-radius: 20%;
+            width: 18px;
+            height: 14px;
+            margin-top: 10px;
+            border: 2px solid #000;
+            margin-right: 5px;
+        } 
+        /*Legend styles*/
+        #legend h4 {
+            margin: 0 0 6px 0;
+            padding: 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+            
+
+       /*Toggle Switch styles*/
+        .switch {
+        position: absolute;
+        z-index: 2;
+        top: 10px;
+        left: 10px;
+        display: inline-block;
+        width: 46px;
+        height: 24px;
+        }
+
+
+        .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #ccc;
+        transition: .3s;
+        }
+
+        
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .3s;
+        }
+
+        /* When checked, move knob + change color */
+        input:checked + .slider {
+        background-color: #4292C6;
+        }
+
+        input:checked + .slider:before {
+        transform: translateX(22px);
+        }
+
+        /* Rounded slider */
+        .slider.round {
+        border-radius: 24px;
+        }
+
+        .slider.round:before {
+        border-radius: 50%;
+        } 
+
+        .mapboxgl-canvas-container.mapboxgl-interactive,
+        .mapboxgl-ctrl-group button.mapboxgl-ctrl-compass {
+            cursor: unset;
+        }
+
+    </style>
+ 
+</head>
+
+<body>
+    <!--Toggle switch-->
+     <label class="switch">
+      <input type="checkbox" id="toggle-snap">
+      <span class="slider round"></span>
+    </label>
+
+    <span id="toggle-label"
+          style="position:absolute; z-index: 2; top:18px; left:70px; font-family:Arial; font-size:13px;">
+      SNAP layer on
+    </span>
+    
+    <div id="map"></div>
+    <div class='map-overlay' id='features'> 
+        <h2> Washington State's SNAP Recipients by County, 2024</h2>
+        <div id="text-description">
+            <p> Hover over and click on a county!</p>
+        </div>
+    </div>
+    <!--legend hidden until toggle checked--> 
+        <div class="map-overlay" id="legend" style="display: none;"></div>
+    <script>
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic2FyYWg0MTZnIiwiYSI6ImNtZ2d3ejl6eTBwajkycXB1dGJzM2huMGwifQ.vV1HxowcTGJ7rBxRgEY7NQ';
+    //base map
+    const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style: 'mapbox://styles/mapbox/light-v11', // style URL
+        zoom: 6, // starting zoom
+        center: [-120, 47] // starting center
+    });
+    // side box element
+    const featuresPanel = document.getElementById('features');
+
+    //locks county in until clicked twice or off
+    let lockedCountyId = null;
+    
+    // helper: update the small hover text (SNAP only)
+    function updateHoverText(feature) {
+        const snapValue = feature.properties.Updated_HH_SNAP;
+    
+        const isMissing = (
+            snapValue === null ||
+            snapValue === undefined ||
+            snapValue === "" ||
+            snapValue === "null"
+        );
+    
+        document.getElementById('text-description').innerHTML = isMissing
+            ? `<h3>${feature.properties.County}</h3>
+               <p><em>No SNAP data available</em></p>`
+            : `<h3>${feature.properties.County}</h3>
+               <p><strong><em>${snapValue}</strong> Households on SNAP</em></p>`;
+    }
+
+
+    async function geojsonFetch() { 
+
+        let response = await fetch('assets/Master_DS.geojson');
+        let Master_DS = await response.json();
+
+        //adds choropleth layer using SNAP data
+        map.on('load', function loadingData() {       
+            map.addSource('Master_DS', {
+                type: 'geojson',
+                data: Master_DS
+            });
+
+            map.addLayer({
+                'id': 'Master_DS-layer',
+                'type': 'fill',
+                'source': 'Master_DS',
+                'paint': {
+                    'fill-color': [
+                        //if snapval = null greys it out
+                        'case',
+                        ['==',['get', 'Updated_HH_SNAP'], null],
+                        '#d9d9d9',
+                    [
+                    'step',
+                    ['get', 'Updated_HH_SNAP'],
+
+                    '#f7fbff', // < 5,218
+                    5218, '#deebf7', 
+                     // 5,218 – 7,529
+                    7529, '#c6dbef', 
+                     // 7,530 – 12,915
+                    12916, '#9ecae1',
+                     // 12,916 – 21,745
+                    21746, '#6baed6',
+                     // 21,746 – 33,432
+                    33433, '#4292c6',
+                     // 33,433 – 43,977
+                    43978, '#2171b5',
+                     // 43,978 – 75,337
+                    75337, '#08519c'
+                      // > 75,337 
+                    ]
+                    ],
+                    'fill-outline-color': '#BBBBBB',
+                    'fill-opacity': 0.9,
+                }
+            });
+            const layers = [
+                
+                "3,243 - 5,217",
+                "5,218 - 7,529",
+                "7,530 - 12,915",
+                "12,916 - 21,745",
+                "21,746 - 33,432",
+                "33,433 - 43,977",
+                "43,978 - 75,337",
+                "No data"
+            ];
+
+            const colors = [
+                '#f7fbff',
+                '#deebf7',
+                '#c6dbef',
+                '#9ecae1',
+                '#6baed6',
+                '#4292c6',
+                '#2171b5',
+                '#d9d9d9' 
+            ];
+
+
+             
+
+            const checkbox = document.getElementById('toggle-snap');
+
+            const label = document.getElementById('toggle-label');
+
+            const layerId = "Master_DS-layer";
+
+            const legend = document.getElementById("legend");
+
+            const legendTitle = document.createElement('h4');
+            legendTitle.textContent = 'SNAP Households';
+            legend.appendChild(legendTitle);
+            
+            layers.forEach((layer, i) => {
+                const item = document.createElement('div');
+                const key = document.createElement('span');
+                
+                key.style.backgroundColor = colors[i];
+                key.className = 'legend-key';
+                key.style.width = '12px';
+                key.style.display = 'inline-block';
+                key.style.height = '12px';
+                key.style.marginRight = '5px';
+
+                const value = document.createElement('span');
+                value.innerHTML = `${layer}`;
+                item.appendChild(key);
+                item.appendChild(value);
+                legend.appendChild(item);
+            });
+
+            
+            
+            // starts with snap layer off
+        
+            map.setLayoutProperty(layerId, 'visibility', 'none');
+            label.textContent = "SNAP layer off"
+
+            // shows snap and all elements when toggle on, hides when uncheked
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    map.setLayoutProperty(layerId, 'visibility', 'visible');
+                    label.textContent = 'SNAP layer on';
+                    legend.style.display = 'block' // shows legend
+                    featuresPanel.style.display = 'block'; //shows hover side bar
+                } else {
+                    map.setLayoutProperty(layerId, 'visibility', 'none');
+                    label.textContent = 'SNAP layer off';
+                    legend.style.display = 'none' //hides legend
+                    featuresPanel.style.display = 'none'; //hides sidebar
+                    lockedCountyId = null; // reset when lock off
+                }
+                    
+            });
+            // hover interaction only active when layer on
+            //shows side box with snap vals when hovered
+            // hover interaction only active when layer on
+            // shows side box with SNAP values when hovered
+            // hover interaction only active when layer on
+            // shows side box with SNAP values when hovered
+            map.on('mousemove', ({ point }) => {
+                const visibility = map.getLayoutProperty('Master_DS-layer', 'visibility');
+                if (visibility === 'none') return;
+            
+                //  If the panel is expanded, do NOT change it on hover
+                if (featuresPanel.classList.contains('expanded')) return;
+            
+                //  If a county is locked, also ignore hover updates
+                if (lockedCountyId !== null) return;
+            
+                const county = map.queryRenderedFeatures(point, {
+                    layers: ['Master_DS-layer']
+                });
+            
+                if (county.length) {
+                    // update small hover text
+                    updateHoverText(county[0]);
+                } else {
+                    
+                }
+            });
+
+
+            // expands when clicked, shows additional attibutes 
+            map.on('click', ({ point }) => {
+                const visibility = map.getLayoutProperty('Master_DS-layer', 'visibility');
+                if (visibility === 'none') return;
+            
+                const county = map.queryRenderedFeatures(point, {
+                    layers: ['Master_DS-layer']
+                });
+            
+                // If user clicks outside any county → unlock + collapse
+                if (!county.length) {
+                    lockedCountyId = null;
+                    featuresPanel.classList.remove('expanded');
+                    document.getElementById('text-description').innerHTML =
+                        `<p>Hover over and click on a county!</p>`;
+                    return;
+                }
+            
+                const props = county[0].properties;
+            
+                // Use County name as ID for locking (since your data has no GEOID in the code you posted)
+                const countyId = props.County;
+            
+                // If clicking the same county again → unlock + return to hover mode
+                if (lockedCountyId === countyId) {
+                    lockedCountyId = null;
+                    featuresPanel.classList.remove('expanded');
+                    updateHoverText(county[0]);   // small hover-style box
+                    return;
+                }
+            
+                // Lock this county for scrolling
+                lockedCountyId = countyId;
+            
+                const snapValue = props.Updated_HH_SNAP;
+                const displaySnap =
+                    (snapValue === null || snapValue === undefined || snapValue === "" || snapValue === "null")
+                        ? "No data"
+                        : snapValue;
+            
+                // Food access labels
+                const accessColumns = [
+                    { name: "Updated Food Access_lapophalf", label: "Residents > 0.5 miles from food" },
+                    { name: "Updated Food Access_lapop1", label: "Residents > 1 mile from food" },
+                    { name: "Updated Food Access_lapop10", label: "Residents > 10 miles from food" },
+                    { name: "Updated Food Access_lapop20", label: "Residents > 20 miles from food" }
+                ];
+            
+                // Build expanded content
+                let content = `
+                    <h3>${props.County}</h3>
+                    <p><strong>${displaySnap}</strong> Households on SNAP</p>
+                `;
+            
+                accessColumns.forEach(col => {
+                    let val = props[col.name];
+                    if (val === null || val === undefined || val === "" || val === "null") {
+                        content += `<p>${col.label}: No data</p>`;
+                    } else {
+                        const pop = props["Updated Popualtion_POP_2025"];
+                        const percent = ((val / pop) * 100).toFixed(1);
+                        content += `<p>${col.label}: <strong>${percent}</strong>%</p>`;
+                    }
+                });
+            
+                // Update sidebar + expand
+                const container = document.getElementById('text-description');
+                container.innerHTML = content;
+                container.style.height = "auto";
+            
+                featuresPanel.classList.add('expanded');
+            });
+
+
+
+        });
+    }
+    geojsonFetch();
+      
+    </script>
+
+</body>
+</html>
