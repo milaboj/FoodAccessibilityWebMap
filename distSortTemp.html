@@ -13,6 +13,8 @@
     />
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/template.css">
     <style>
         h2, h3 {
         margin: 10px;
@@ -51,7 +53,7 @@
         #features {
             top: 0;
             height: 150px;
-            margin-top: 20px;
+            margin-top: 70px;
             width: 250px;
         }
 
@@ -59,10 +61,58 @@
         .mapboxgl-ctrl-group button.mapboxgl-ctrl-compass {
             cursor: unset;
         }
+        .topnav {
+            background-color: #333;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .topnav a {
+            float: left;
+            display: block;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 26px;
+        }
+
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .topnav .active {
+            background-color: #04AA6D;
+            color: white;
+        }
+
+        /* Fix map overlapping the navbar */
+        #map {
+            position: absolute;
+            top: 65px;  /* height of your nav bar */
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
     </style>
 </head> 
 
 <body>
+        <!-- Navigation bar -->
+    <div class="topnav" id="myTopnav">
+        <a href="index.html">Overview</a>
+        <a href="section2.html">Closest Grocery Map</a>
+        <a href="section1.html">SNAP Benefits Map</a>
+        <a class="active" href="distSortTemp.html">Nearest Food Facility</a>
+        <a href="section3.html">What now?</a>
+        <a href="references.html">References</a>
+
+        <a href="javascript:void(0);" class="icon">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
     <div id="map"></div>
     <div class='map-overlay' id='features'>
         <h2>King County Food Facilities</h2>
