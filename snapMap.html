@@ -347,11 +347,16 @@
             //shows side box with snap vals when hovered
             // hover interaction only active when layer on
             // shows side box with SNAP values when hovered
+            // hover interaction only active when layer on
+            // shows side box with SNAP values when hovered
             map.on('mousemove', ({ point }) => {
                 const visibility = map.getLayoutProperty('Master_DS-layer', 'visibility');
                 if (visibility === 'none') return;
             
-                // If a county is locked (clicked), ignore hover updates
+                //  If the panel is expanded, do NOT change it on hover
+                if (featuresPanel.classList.contains('expanded')) return;
+            
+                //  If a county is locked, also ignore hover updates
                 if (lockedCountyId !== null) return;
             
                 const county = map.queryRenderedFeatures(point, {
@@ -359,13 +364,13 @@
                 });
             
                 if (county.length) {
-                    // update small hover text, but DON'T touch expanded state
+                    // update small hover text
                     updateHoverText(county[0]);
                 } else {
-                    // do nothing when not over a county
-                    // (keeps last hovered county visible)
+                    
                 }
             });
+
 
             // expands when clicked, shows additional attibutes 
             map.on('click', ({ point }) => {
