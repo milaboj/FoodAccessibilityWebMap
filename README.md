@@ -5,14 +5,14 @@ This website has two maps that come together to illustrate the supply limitation
 
 The SNAP benefits map is a choropleth map that visualizes the household participation in the Supplementantal Nutrition Assistance Program (SNAP) using county level data from the U.S Census Bureau. Each county is shaded based on the number of households recivng SNAP benifits. When hovering over a county, users are able to see the exact number of households enrolled in SNAP for that area. Clicking on a specific county reveals additional stats by showing food access data including the percentage of the county's population living more than 0.5 miles, 1 mile, 10 miles, and 20 miles of a food source, helping users understand how SNAP participation and food accessibility intersects. 
 
-The distance to grocery stores map 
+The food facility finder map shows points of all of the food facilities in King County including grocery stores, restaurants, school cafeterias, etc. When users click on a point a pop-up shows up with the name and address of that food facility. It also allows users to search any address and see the nearest food facility from the King County dataset to that location. 
 
 Our data was retrieved from:
 
 Department of Agriculture's Food Access Research Atlas (https://catalog.data.gov/dataset/food-access-research-atlas) 
 Washington's State's 2025 Census (https://catalog.data.gov/dataset/waofm-april-1-population-by-state-county-and-city-1990-to-present)
 United State's Census Bureau (https://data.census.gov/table/ACSST5Y2023.S2201?q=S2201:+Food+Stamps/Supplemental+Nutrition+Assistance+Program+(SNAP)&g=040XX00US53$0500000)
-ADD GROCERY STORE DATA
+King County GIS Data Catalog (https://www5.kingcounty.gov/SDC/?Layer=food_facilities_point)
 
 AI disclosure: 
 Show your favicon
