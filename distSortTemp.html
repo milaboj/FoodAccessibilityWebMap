@@ -185,6 +185,22 @@
           // Find nearest store using Turf.js
           const nearest = turf.nearestPoint(searchCoords, storeData);
 
+          // Build a line from search point → nearest store
+            const line = {
+                type: "Feature",
+                geometry: {
+                    type: "LineString",
+                    coordinates: [
+                        searchCoords,
+                        nearest.geometry.coordinates
+                    ]
+                }
+            };
+
+            // Update the GeoJSON line source
+            map.getSource("nearest-line").setData(line);
+
+
           // Highlight it by filtering the "closest-store" layer
           map.setFilter("closest-store", [
               "==",
@@ -253,6 +269,27 @@
                         `)
                         .addTo(map);
                 });
+                map.addSource("nearest-line", {
+                    type: "geojson",
+                    data: {
+                        type: "Feature",
+                        geometry: {
+                            type: "LineString",
+                            coordinates: []
+                        }
+                    }
+                });
+
+                map.addLayer({
+                    id: "nearest-line-layer",
+                    type: "line",
+                    source: "nearest-line",
+                    paint: {
+                        "line-color": "#ff0000",
+                        "line-width": 3
+                    }
+                });
+
 
             });
         }
