@@ -97,13 +97,12 @@
         }
 
     </style>
-</head> 
+</head>
 
 <body>
         <!-- Navigation bar -->
     <div class="topnav" id="myTopnav">
         <a href="index.html">Overview</a>
-        <a href="section2.html">Closest Grocery Map</a>
         <a href="section1.html">SNAP Benefits Map</a>
         <a class="active" href="distSortTemp.html">Nearest Food Facility</a>
         <a href="section3.html">What now?</a>
@@ -130,9 +129,9 @@
                 center: [-121.75, 47.5] // starting center
             }
         );
-        
 
-        async function geojsonFetch() { 
+
+        async function geojsonFetch() {
           const storeData = await fetch("assets/Food_Facilites_-_Multiple_Classes_-_For_King_County___food_facilities_point.geojson")
               .then(res => res.json());
 
@@ -140,7 +139,7 @@
               type: "geojson",
               data: storeData
           });
-          
+
           map.addLayer({
               id: "store-points",
               type: "circle",
@@ -204,7 +203,7 @@
           // Highlight it by filtering the "closest-store" layer
           map.setFilter("closest-store", [
               "==",
-              "OBJECTID",    
+              "OBJECTID",
               nearest.properties.OBJECTID
           ]);
 
