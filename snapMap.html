@@ -195,6 +195,28 @@
     // side box element
     const featuresPanel = document.getElementById('features');
 
+    //locks county in until clicked twice or off
+    let lockedCountyId = null;
+    
+    // helper: update the small hover text (SNAP only)
+    function updateHoverText(feature) {
+        const snapValue = feature.properties.Updated_HH_SNAP;
+    
+        const isMissing = (
+            snapValue === null ||
+            snapValue === undefined ||
+            snapValue === "" ||
+            snapValue === "null"
+        );
+    
+        document.getElementById('text-description').innerHTML = isMissing
+            ? `<h3>${feature.properties.County}</h3>
+               <p><em>No SNAP data available</em></p>`
+            : `<h3>${feature.properties.County}</h3>
+               <p><strong><em>${snapValue}</strong> Households on SNAP</em></p>`;
+    }
+
+
     async function geojsonFetch() { 
 
         let response = await fetch('assets/Master_DS.geojson');
@@ -317,89 +339,107 @@
                     label.textContent = 'SNAP layer off';
                     legend.style.display = 'none' //hides legend
                     featuresPanel.style.display = 'none'; //hides sidebar
+                    lockedCountyId = null; // reset when lock off
                 }
                     
             });
             // hover interaction only active when layer on
             //shows side box with snap vals when hovered
-            map.on('mousemove', ({point}) => {
-
+            // hover interaction only active when layer on
+            // shows side box with SNAP values when hovered
+            map.on('mousemove', ({ point }) => {
                 const visibility = map.getLayoutProperty('Master_DS-layer', 'visibility');
-
-                if (visibility === 'none') return; 
-
-                featuresPanel.classList.remove('expanded');
-
+                if (visibility === 'none') return;
+            
+                // If a county is locked (clicked), ignore hover updates
+                if (lockedCountyId !== null) return;
+            
                 const county = map.queryRenderedFeatures(point, {
                     layers: ['Master_DS-layer']
                 });
-
+            
                 if (county.length) {
-                    const snapValue = county[0].properties.Updated_HH_SNAP;
-
-                    const isMissing = (snapValue === null || snapValue === undefined || snapValue === "" || snapValue === "null");
-
-                    document.getElementById('text-description').innerHTML = isMissing
-                        ? `<h3>${county[0].properties.County}</h3>
-                        <p><em>No SNAP data available</em></p>`
-                        : `<h3>${county[0].properties.County}</h3>
-                        <p><strong><em>${snapValue}</strong> Households on SNAP</em></p>`;
-                    
+                    // update small hover text, but DON'T touch expanded state
+                    updateHoverText(county[0]);
                 } else {
-                    document.getElementById('text-description').innerHTML = `<p>Hover over a county!</p>`;
+                    // do nothing when not over a county
+                    // (keeps last hovered county visible)
                 }
-                // when user is moving mouse small box 
-                featuresPanel.classList.remove('expanded');
             });
+
             // expands when clicked, shows additional attibutes 
-            map.on('click', ({point}) => {
+            map.on('click', ({ point }) => {
+                const visibility = map.getLayoutProperty('Master_DS-layer', 'visibility');
+                if (visibility === 'none') return;
+            
                 const county = map.queryRenderedFeatures(point, {
                     layers: ['Master_DS-layer']
                 });
-
-                if (county.length) {
-                    const props = county[0].properties;
-
-                    const snapValue = props.Updated_HH_SNAP;
-                    const displaySnap = (snapValue === null || snapValue === undefined || snapValue === "" || snapValue === "null")
+            
+                // If user clicks outside any county → unlock + collapse
+                if (!county.length) {
+                    lockedCountyId = null;
+                    featuresPanel.classList.remove('expanded');
+                    document.getElementById('text-description').innerHTML =
+                        `<p>Hover over and click on a county!</p>`;
+                    return;
+                }
+            
+                const props = county[0].properties;
+            
+                // Use County name as ID for locking (since your data has no GEOID in the code you posted)
+                const countyId = props.County;
+            
+                // If clicking the same county again → unlock + return to hover mode
+                if (lockedCountyId === countyId) {
+                    lockedCountyId = null;
+                    featuresPanel.classList.remove('expanded');
+                    updateHoverText(county[0]);   // small hover-style box
+                    return;
+                }
+            
+                // Lock this county for scrolling
+                lockedCountyId = countyId;
+            
+                const snapValue = props.Updated_HH_SNAP;
+                const displaySnap =
+                    (snapValue === null || snapValue === undefined || snapValue === "" || snapValue === "null")
                         ? "No data"
                         : snapValue;
-                    // food access labels
-                    const accessColumns = [
-                        {name: "Updated Food Access_lapophalf", label: "Residents > 0.5 miles from food"},
-                        {name: "Updated Food Access_lapop1", label: "Residents > 1 mile from food"},
-                        {name: "Updated Food Access_lapop10", label: "Residents > 10 miles from food"},
-                        {name: "Updated Food Access_lapop20", label: "Residents > 20 miles from food"}
-                    ];
+            
+                // Food access labels
+                const accessColumns = [
+                    { name: "Updated Food Access_lapophalf", label: "Residents > 0.5 miles from food" },
+                    { name: "Updated Food Access_lapop1", label: "Residents > 1 mile from food" },
+                    { name: "Updated Food Access_lapop10", label: "Residents > 10 miles from food" },
+                    { name: "Updated Food Access_lapop20", label: "Residents > 20 miles from food" }
+                ];
+            
+                // Build expanded content
+                let content = `
+                    <h3>${props.County}</h3>
+                    <p><strong>${displaySnap}</strong> Households on SNAP</p>
+                `;
+            
+                accessColumns.forEach(col => {
+                    let val = props[col.name];
+                    if (val === null || val === undefined || val === "" || val === "null") {
+                        content += `<p>${col.label}: No data</p>`;
+                    } else {
+                        const pop = props["Updated Popualtion_POP_2025"];
+                        const percent = ((val / pop) * 100).toFixed(1);
+                        content += `<p>${col.label}: <strong>${percent}</strong>%</p>`;
+                    }
+                });
+            
+                // Update sidebar + expand
+                const container = document.getElementById('text-description');
+                container.innerHTML = content;
+                container.style.height = "auto";
+            
+                featuresPanel.classList.add('expanded');
+            });
 
-        
-        let content = `<h3>${props.County}</h3>
-                    <p><strong>${displaySnap}</strong> Households on SNAP</p>`; // <-- CHANGED
-        
-        accessColumns.forEach(col => {
-            // val is residents and their distance from food
-            let val = props[col.name];
-            if (val === null || val === undefined || val === "" || val === "null") {
-                content += `<p>${col.label}: No data</p>`;
-            } else {
-                // Calculate percentage of county population
-                const pop = props["Updated Popualtion_POP_2025"];
-                const percent = ((val / pop) * 100).toFixed(1);
-                //final percentage
-                content += `<p>${col.label}: <strong>${percent}</strong>% </p>`;
-            }
-        });
-
-        // Update sidebar and expands 
-        const container = document.getElementById('text-description');
-        container.innerHTML = content;
-        container.style.height = "auto";
- 
-        featuresPanel.classList.add('expanded');
-    } else {
-        document.getElementById('text-description').innerHTML = `<p>Click on a county!</p>`;
-    }        
-});
 
 
         });
