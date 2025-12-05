@@ -2,27 +2,42 @@
 <html>
 
 <head>
-    <title>Page Title</title>
+  <meta charset="utf-8" />
+  <title>Sorting Distance </title>
 
-    <!-- Including the main.css file for styling -->
-    <link rel="stylesheet" href="css/template.css">
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/section2.css" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 
-    <!-- Including the Font Awesome CSS library for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Mapbox GL -->
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.css" rel="stylesheet" />
+
+  <link
+  rel="stylesheet"
+  href="https://unpkg.com/@mapbox/mapbox-gl-geocoder@5.1.2/dist/mapbox-gl-geocoder.css"
+  type="text/css"
+  />
+
+  <script src="https://unpkg.com/@mapbox/mapbox-gl-geocoder@5.1.2/dist/mapbox-gl-geocoder.min.js"></script>
+
+  <!-- Turf.js for distance -->
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 </head>
 
 <body>
 
-    <!-- Navigation bar -->
-    <div class="topnav" id="myTopnav">
+  <!-- Top navigation (same structure as other pages) -->
+  <div class="topnav" id="myTopnav">
         <!-- Links to different sections -->
         <a href="index.html">Overview</a>
         <a href="section1.html">SNAP Benefits Map</a>
-
-        <!-- Active link pointing to the section2.html page -->
         <a class="active" href="section2.html">Closest Grocery Map</a>
 
+        <!-- Active link pointing to the section3.html page -->
         <a href="section3.html">Analysis</a>
+
         <a href="references.html">References</a>
 
         <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links on smaller screens -->
@@ -31,26 +46,23 @@
         </a>
     </div>
 
-    <!-- Page content -->
-    <div class="content">
-        <!-- Section 2 content -->
-
-        <h2>Find the Closet Geocery Store</h2>
-
-        Here should be a grocery store interactive map
+  <!-- Map + sidebar layout -->
+  <div class="content">
+    <div class="sidebar">
+      <div class="heading">
+        <h1>Our locations</h1>
+      </div>
+      <div id="listings" class="listings"></div>
     </div>
 
-            <!-- Description placeholder -->
-        <div class="description-box">
-            desscription for closest grocery store map: 
-            description description description description description description
-            description description description description description description
-            description description description description description description
-        </div>
+    <div id="map" class="map"></div>
+  </div>
 
-    <!-- Including the main.js file for JavaScript functionality -->
-    <script src="js/template.js"></script>
+  <!-- JS: your nav script (optional) -->
+  <script src="js/template.js"></script>
 
+  <!-- JS: map logic -->
+  <script src="js/section2.js"></script>
 </body>
 
 </html>
