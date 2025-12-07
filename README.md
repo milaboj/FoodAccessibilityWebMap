@@ -7,6 +7,7 @@ The SNAP benefits map is a choropleth map that visualizes the household particip
 
 <img width="1440" height="811" alt="Screenshot 2025-12-07 at 2 20 05 PM" src="https://github.com/user-attachments/assets/4883911c-cd69-4521-bdf7-3ad6925a95b5" />
 
+
 The food facility finder map shows points of all of the food facilities in King County including grocery stores, restaurants, school cafeterias, etc. When users click on a point a pop-up shows up with the name and address of that food facility. It also allows users to search any address and see the nearest food facility from the King County dataset to that location.
 
 <img width="1440" height="812" alt="Screenshot 2025-12-07 at 2 20 28 PM" src="https://github.com/user-attachments/assets/50a3c5ce-725c-4f34-9c21-eae25eb0a18b" />
