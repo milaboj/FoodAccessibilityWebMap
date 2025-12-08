@@ -1,4 +1,4 @@
-# Food Access in Washington State <img src="img/favicon.png" height="40">
+# Food Access in Washington State <img src="assets/img/favicon.png" height="40">
 
 
 
