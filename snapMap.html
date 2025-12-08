@@ -5,10 +5,11 @@
     <meta charset="utf-8">
     <title>Interactive Web Mapping</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-
+    
+    <!-- Mapbox GL JS -->
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.js"></script>
-
+    
     <style>
         body {
             margin: 0;
@@ -28,6 +29,7 @@
             margin: 10px;
         }
 
+        /* Full page map */
         #map {
             position: absolute;
             top: 0;
@@ -41,233 +43,323 @@
             position: absolute;
             bottom: 0;
             left: 0;
-            background: rgba(255, 255, 255, 0.85);
-            border: 1px solid rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.8);
+            border-style: solid;
+            border-width: 1px;
+            border-color: rgba(0, 0, 0, 0.2);
             margin-left: 20px;
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             overflow: auto;
             border-radius: 3px;
         }
 
+        /* Hover / side info box */
         #features {
             top: 0;
             right: 0;
             left: auto;
             width: 255px;
-            max-height: 150px;
-            height: auto;
-            overflow-y: auto;
-            display: none;
+            max-height: 150px; /* prevents it from going off screen */
+            height: auto; 
+            overflow-y: auto; /* scroll only if content exceeds max-height */
+            transition: max-height 0.3s ease, width 0.3s ease;
+            display: block; /* always visible now */
         }
 
+        /* Expanded side box once clicked */
         #features.expanded {
             width: 255px;
             max-height: 35%;
         }
 
+        /* Legend container */
         #legend {
             padding: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             line-height: 18px;
+            height: auto;
             margin-bottom: 40px;
             width: 150px;
-            display: block;
         }
 
+        /* Colored squares */
         .legend-key {
             display: inline-block;
             border-radius: 20%;
-            width: 14px;
+            width: 18px;
             height: 14px;
+            margin-top: 10px;
+            border: 2px solid #000;
             margin-right: 5px;
-            border: 1px solid #000;
         }
+
+        /* Legend styles */
+        #legend h4 {
+            margin: 0 0 6px 0;
+            padding: 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .mapboxgl-canvas-container.mapboxgl-interactive,
+        .mapboxgl-ctrl-group button.mapboxgl-ctrl-compass {
+            cursor: unset;
+        }
+
     </style>
+ 
 </head>
 
 <body>
-
     <div id="map"></div>
 
-    <div class="map-overlay" id="features">
-        <h2>Washington State SNAP Percentage by County</h2>
+    <!-- Side info box -->
+    <div class='map-overlay' id='features'> 
+        <h2> Washington State's SNAP Recipients by County, 2024</h2>
         <div id="text-description">
             <p>Hover over and click on a county!</p>
         </div>
     </div>
 
+    <!-- Legend (visible by default now) -->
     <div class="map-overlay" id="legend"></div>
 
     <script>
         mapboxgl.accessToken = 'pk.eyJ1Ijoic2FyYWg0MTZnIiwiYSI6ImNtZ2d3ejl6eTBwajkycXB1dGJzM2huMGwifQ.vV1HxowcTGJ7rBxRgEY7NQ';
 
+        // Base map
         const map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/light-v11',
-            center: [-120, 47],
-            zoom: 6
+            zoom: 6,
+            center: [-120, 47]
         });
 
         const featuresPanel = document.getElementById('features');
+        // Tracks which county (by GEOID) is "locked" from a click
         let lockedCountyId = null;
 
-        function updateHoverText(feature) {
-            const props = feature.properties;
-            const snap = props.Updated_HH_SNAP;
-            const pop = props["Updated Popualtion_POP_2025"];
-
-            let display = `<h3>${props.County}</h3>`;
-
-            if (!snap || !pop) {
-                display += `<p><em>No SNAP data available</em></p>`;
-            } else {
-                const percent = ((snap / pop) * 100).toFixed(1);
-                display += `<p><strong>${percent}%</strong> of population on SNAP</p>`;
-            }
-
-            document.getElementById('text-description').innerHTML = display;
-        }
-
-        async function geojsonFetch() {
-            let response = await fetch("assets/Master_DS.geojson");
+        async function geojsonFetch() { 
+            let response = await fetch('assets/Master_DS.geojson');
             let Master_DS = await response.json();
 
-            map.on("load", () => {
-                map.addSource("Master_DS", {
-                    type: "geojson",
+            // Add choropleth layer using SNAP data
+            map.on('load', function loadingData() {       
+                map.addSource('Master_DS', {
+                    type: 'geojson',
                     data: Master_DS
                 });
 
-                // CHOROPLETH USING % SNAP
+                // Choropleth based on % of population on SNAP (normalized)
+                // % = (Updated_HH_SNAP / Updated Popualtion_POP_2025) * 100
                 map.addLayer({
-                    id: "Master_DS-layer",
-                    type: "fill",
-                    source: "Master_DS",
-                    paint: {
-                        "fill-color": [
-                            "case",
-                            ["||",
-                                ["==", ["get", "Updated_HH_SNAP"], null],
-                                ["==", ["get", "Updated Popualtion_POP_2025"], null]
+                    'id': 'Master_DS-layer',
+                    'type': 'fill',
+                    'source': 'Master_DS',
+                    'paint': {
+                        'fill-color': [
+                            'case',
+                            // Grey out if missing SNAP or population or population is 0
+                            ['any',
+                                ['==', ['get', 'Updated_HH_SNAP'], null],
+                                ['==', ['get', 'Updated Popualtion_POP_2025'], null],
+                                ['==', ['get', 'Updated Popualtion_POP_2025'], 0]
                             ],
-                            "#d9d9d9",
-
+                            '#d9d9d9',
                             [
-                                "step",
+                                'step',
                                 [
-                                    "*",
+                                    '*',
                                     [
-                                        "/",
-                                        ["get", "Updated_HH_SNAP"],
-                                        ["get", "Updated Popualtion_POP_2025"]
+                                        '/',
+                                        ['get', 'Updated_HH_SNAP'],
+                                        ['get', 'Updated Popualtion_POP_2025']
                                     ],
                                     100
                                 ],
-                                "#f7fbff", 2,
-                                "#deebf7", 4,
-                                "#c6dbef", 6,
-                                "#9ecae1", 8,
-                                "#6baed6", 10,
-                                "#4292c6", 12,
-                                "#2171b5"
+                                '#f7fbff', // < 5%
+                                5,  '#deebf7', // 5 - 10%
+                                10, '#c6dbef', // 10 - 15%
+                                15, '#9ecae1', // 15 - 20%
+                                20, '#6baed6', // 20 - 25%
+                                25, '#4292c6', // 25 - 30%
+                                30, '#2171b5' // > 30%
                             ]
                         ],
-                        "fill-outline-color": "#BBB",
-                        "fill-opacity": 0.9
+                        'fill-outline-color': '#BBBBBB',
+                        'fill-opacity': 0.9
                     }
                 });
 
-                // LEGEND  
-                const breaks = [
-                    "0–2%",
-                    "2–4%",
-                    "4–6%",
-                    "6–8%",
-                    "8–10%",
-                    "10–12%",
-                    "> 12%",
+                const layers = [
+                    "0% - 5%",
+                    "5% - 10%",
+                    "10% - 15%",
+                    "15% - 20%",
+                    "20% - 25%",
+                    "25% - 30%",
+                    "30% +",
                     "No data"
                 ];
 
                 const colors = [
-                    "#f7fbff",
-                    "#deebf7",
-                    "#c6dbef",
-                    "#9ecae1",
-                    "#6baed6",
-                    "#4292c6",
-                    "#2171b5",
-                    "#d9d9d9"
+                    '#f7fbff',
+                    '#deebf7',
+                    '#c6dbef',
+                    '#9ecae1',
+                    '#6baed6',
+                    '#4292c6',
+                    '#2171b5',
+                    '#d9d9d9'
                 ];
 
                 const legend = document.getElementById("legend");
-                const title = document.createElement("h4");
-                title.textContent = "% of Population on SNAP";
-                legend.appendChild(title);
 
-                breaks.forEach((label, i) => {
-                    const item = document.createElement("div");
-                    const key = document.createElement("span");
-
-                    key.className = "legend-key";
+                const legendTitle = document.createElement('h4');
+                legendTitle.textContent = 'SNAP Households (% of population)';
+                legend.appendChild(legendTitle);
+                
+                layers.forEach((layer, i) => {
+                    const item = document.createElement('div');
+                    const key = document.createElement('span');
+                    
                     key.style.backgroundColor = colors[i];
+                    key.className = 'legend-key';
+                    key.style.width = '12px';
+                    key.style.display = 'inline-block';
+                    key.style.height = '12px';
+                    key.style.marginRight = '5px';
 
-                    const value = document.createElement("span");
-                    value.innerHTML = label;
-
+                    const value = document.createElement('span');
+                    value.innerHTML = `${layer}`;
                     item.appendChild(key);
                     item.appendChild(value);
                     legend.appendChild(item);
                 });
 
-                featuresPanel.style.display = "block";
+                // Make sure the side panel is visible from the start
+                featuresPanel.style.display = 'block';
 
-                // Hover
-                map.on("mousemove", ({ point }) => {
-                    if (featuresPanel.classList.contains("expanded")) return;
-                    if (lockedCountyId !== null) return;
+                // Hover interaction: show county + SNAP info
+                map.on('mousemove', ({ point }) => {
+                    // If a county is locked from a click, ignore hover updates
+                    if (lockedCountyId !== null) {
+                        return;
+                    }
 
                     const county = map.queryRenderedFeatures(point, {
-                        layers: ["Master_DS-layer"]
+                        layers: ['Master_DS-layer']
                     });
 
-                    if (county.length) updateHoverText(county[0]);
+                    // Only collapse to small size when not locked
+                    featuresPanel.classList.remove('expanded');
+
+                    if (county.length) {
+                        const props = county[0].properties;
+                        const snapValue = props.Updated_HH_SNAP;
+                        const pop = props["Updated Popualtion_POP_2025"];
+
+                        const hasSnap = !(snapValue === null || snapValue === undefined || snapValue === "" || snapValue === "null");
+                        const hasPop = !(pop === null || pop === undefined || pop === "" || pop === "null" || pop === 0);
+
+                        let html = `<h3>${props.County}</h3>`;
+
+                        if (!hasSnap) {
+                            html += `<p><em>No SNAP data available</em></p>`;
+                        } else if (!hasPop) {
+                            html += `<p><strong><em>${snapValue}</strong> households on SNAP</em></p>`;
+                        } else {
+                            const snapPercent = ((snapValue / pop) * 100).toFixed(1);
+                            html += `<p><strong><em>${snapValue}</strong> households on SNAP</em></p>
+                                     <p><em>About <strong>${snapPercent}%</strong> of the county population</em></p>`;
+                        }
+
+                        document.getElementById('text-description').innerHTML = html;
+                    } else {
+                        document.getElementById('text-description').innerHTML = `<p>Hover over a county!</p>`;
+                    }
                 });
 
-                // Click for expanded info
-                map.on("click", ({ point }) => {
+                // Click interaction: lock/unlock on a county
+                map.on('click', ({ point }) => {
                     const county = map.queryRenderedFeatures(point, {
-                        layers: ["Master_DS-layer"]
+                        layers: ['Master_DS-layer']
                     });
 
                     if (!county.length) {
+                        // Clicked empty map area: keep current lock as-is
+                        return;
+                    }
+
+                    const props = county[0].properties;
+                    const thisCountyId = props.GEOID; // use GEOID as unique ID
+
+                    // If we clicked the same county that's already locked -> unlock it
+                    if (lockedCountyId === thisCountyId) {
                         lockedCountyId = null;
-                        featuresPanel.classList.remove("expanded");
+                        featuresPanel.classList.remove('expanded');
                         document.getElementById('text-description').innerHTML =
                             `<p>Hover over and click on a county!</p>`;
                         return;
                     }
 
-                    const props = county[0].properties;
-                    const snap = props.Updated_HH_SNAP;
+                    // Lock to this newly clicked county
+                    lockedCountyId = thisCountyId;
+
+                    const snapValue = props.Updated_HH_SNAP;
                     const pop = props["Updated Popualtion_POP_2025"];
 
-                    lockedCountyId = props.County;
+                    const hasSnap = !(snapValue === null || snapValue === undefined || snapValue === "" || snapValue === "null");
+                    const hasPop = !(pop === null || pop === undefined || pop === "" || pop === "null" || pop === 0);
 
-                    let percent = (!snap || !pop) ? null : ((snap / pop) * 100).toFixed(1);
-                    let snapText = percent ? `${percent}% on SNAP` : "No SNAP data";
+                    const displaySnap = hasSnap ? snapValue : "No data";
 
-                    let content = `
-                        <h3>${props.County}</h3>
-                        <p><strong>${snapText}</strong></p>
-                    `;
+                    // Food access labels
+                    const accessColumns = [
+                        {name: "Updated Food Access_lapophalf", label: "Residents > 0.5 miles from food"},
+                        {name: "Updated Food Access_lapop1",    label: "Residents > 1 mile from food"},
+                        {name: "Updated Food Access_lapop10",   label: "Residents > 10 miles from food"},
+                        {name: "Updated Food Access_lapop20",   label: "Residents > 20 miles from food"}
+                    ];
 
-                    document.getElementById("text-description").innerHTML = content;
-                    featuresPanel.classList.add("expanded");
+                    let content = `<h3>${props.County}</h3>`;
+
+                    if (!hasSnap) {
+                        content += `<p><strong>No SNAP data</strong></p>`;
+                    } else if (!hasPop) {
+                        content += `<p><strong>${displaySnap}</strong> households on SNAP</p>`;
+                    } else {
+                        const snapPercent = ((snapValue / pop) * 100).toFixed(1);
+                        content += `<p><strong>${displaySnap}</strong> households on SNAP</p>
+                                    <p>That's about <strong>${snapPercent}%</strong> of the county population.</p>`;
+                    }
+
+                    // Food access percentages (normalized by population)
+                    accessColumns.forEach(col => {
+                        let val = props[col.name];
+                        if (val === null || val === undefined || val === "" || val === "null") {
+                            content += `<p>${col.label}: No data</p>`;
+                        } else if (!hasPop) {
+                            // can't compute percentage without population
+                            content += `<p>${col.label}: ${val} (population missing)</p>`;
+                        } else {
+                            const percent = ((val / pop) * 100).toFixed(1);
+                            content += `<p>${col.label}: <strong>${percent}</strong>%</p>`;
+                        }
+                    });
+
+                    const container = document.getElementById('text-description');
+                    container.innerHTML = content;
+                    container.style.height = "auto";
+
+                    // Expand panel when locked
+                    featuresPanel.classList.add('expanded');
                 });
             });
         }
 
         geojsonFetch();
     </script>
+
 </body>
 </html>
